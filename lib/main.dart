@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Input.dart';
-import 'Result.dart';
 import 'Convert.dart';
+import 'Result.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,16 +15,24 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  List<String> listViewItem = List<String>();
+  String _newValue = "Kelvin";
+  double _result = 0;
+
   TextEditingController suhu = new TextEditingController();
 
-  double _inputUser = 0;
+  double _inputSuhu = 0;
   double _kelvin = 0;
   double _reamor = 0;
+  var listItem = ["Kelvin", "Reamur"];
   void _hitungSuhu() {
     setState(() {
-      _inputUser = double.parse(suhu.text);
-      _kelvin = _inputUser + 273;
-      _reamor = (4 / 5) * _inputUser;
+      _inputSuhu = double.parse(suhu.text);
+      if (_newValue == "Kelvin")
+        _result = _inputSuhu + 273;
+      else
+        _result = (4 / 5) * _inputSuhu;
+      listViewItem.add("$_newValue : $_result");
     });
   }
 
@@ -45,8 +53,40 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               Input(suhu: suhu),
-              Result(kelvin: _kelvin, reamor: _reamor),
+              DropdownButton<String>(
+                items: listItem.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                value: _newValue,
+                onChanged: (String changeValue) {
+                  setState(() {
+                    _newValue = changeValue;
+                  });
+                },
+              ),
+              Result(result: _result),
               Convert(konvertHandler: _hitungSuhu),
+              Container(
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                child: Text(
+                  "Riwayat Konversi",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                    children: listViewItem.map((String value) {
+                  return Container(
+                      margin: EdgeInsets.all(10),
+                      child: Text(
+                        value,
+                        style: TextStyle(fontSize: 15),
+                      ));
+                }).toList()),
+              ),
             ],
           ),
         ),
